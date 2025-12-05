@@ -1,0 +1,90 @@
+##############################
+# UNITY
+##############################
+
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+MemoryCaptures/
+
+# Auto-generated Visual Studio / Rider files
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.vsp
+*.pdb
+*.mdb
+
+# Unity cache
+*.stackdump
+
+# Asset Store Tools
+Assets/AssetStoreTools*
+
+# Collab
+. collab
+
+##############################
+# PYTHON BACKEND
+##############################
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+instance/
+.env
+*.db
+*.db-shm
+*.db-wal
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+##############################
+# VS CODE
+##############################
+
+.vscode/
+.vs/
+
+##############################
+# WINDOWS / SO
+##############################
+
+Thumbs.db
+Desktop.ini
+
+##############################
+# MAC
+##############################
+
+.DS_Store
+
+##############################
+# PACKAGES / BUILDS
+##############################
+
+*.zip
+*.rar
+*.apk
+*.exe
+
+##############################
+# OTHERS
+##############################
+
+# Logs
+*.log
