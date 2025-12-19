@@ -1,13 +1,15 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PokemonBase", menuName = "Pokemons/New Pokemon")]
 
 public class PokemonBase : ScriptableObject
 {
-    [SerializeField] string pokemonName;
+    [SerializeField] string name;
 
     [TextArea]
-    [SerializeField] string pokemonDescription;
+    [SerializeField] string description;
 
     [SerializeField] Sprite frontSprite;
     [SerializeField] Sprite backSprite;
@@ -23,6 +25,90 @@ public class PokemonBase : ScriptableObject
     [SerializeField] int specialAttack;
     [SerializeField] int specialDefense;
 
+    [SerializeField] List<LearnableMove> learnableMoves;
+
+
+
+    public string Name
+    {
+        get { return name; }
+    }
+
+    public string Description
+    {
+        get { return description; }
+    }
+
+    public Sprite FrontSprite
+    {
+        get { return frontSprite; }
+    }
+
+    public Sprite BackSprite
+    {
+        get { return backSprite; }
+    }
+
+    public PokemonType Type1
+    {
+        get { return type1; }
+    }
+
+    public PokemonType Type2
+    {
+        get { return type2; }
+    }
+
+    public int MaxHP
+    {
+        get { return maxHP; }
+    }
+
+    public int Attack
+    {
+        get { return attack; }
+    }
+
+    public int Defense
+    {
+        get { return defense; }
+    }
+
+    public int Speed
+    {
+        get { return speed; }
+    }
+
+    public int SpecialAttack
+    {
+        get { return specialAttack; }
+    }
+
+    public int SpecialDefense
+    {
+        get { return specialDefense; }
+    }
+
+    public List<LearnableMove> LearnableMoves
+    {
+        get { return learnableMoves; }
+    }
+
+}
+
+[System.Serializable]
+public class LearnableMove
+{
+    [SerializeField] MoveBase moveBase;
+    [SerializeField] int level;
+    public MoveBase MoveBase
+    {
+        get { return moveBase; }
+    }
+    public int Level
+    {
+        get { return level; }
+    }
 }
 
 public enum PokemonType
@@ -43,4 +129,39 @@ public enum PokemonType
     Rock,
     Ghost,
     Dragon
+}
+
+public class TypeChart
+{
+    static float[][] chart =
+    {
+        //                    NOR  FIR  WAT  ELE  GRA  ICE  FIG  POI  GRO  FLY  PSY  BUG  ROC  GHO  DRA
+        /* NOR */ new float[] {1f, 1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f, 0.5f, 0f,  1f},
+        /* FIR */ new float[] {1f, 0.5f,0.5f,1f,  2f,  2f,  1f,  1f,  1f,  1f,  1f,  2f, 0.5f,1f,  0.5f},
+        /* WAT */ new float[] {1f, 2f,  0.5f,1f,  0.5f,1f,  1f,  1f,  2f,  1f,  1f,  1f, 2f, 1f,  0.5f},
+        /* ELE */ new float[] {1f, 1f,  2f,  0.5f,0.5f,1f,  1f,  1f,  0f,  2f,  1f,  1f, 1f, 1f,  0.5f},
+        /* GRA */ new float[] {1f, 0.5f,2f,  1f,  0.5f,1f,  1f,  0.5f,2f,  0.5f,1f,  0.5f,2f, 1f,  0.5f},
+        /* ICE */ new float[] {1f, 0.5f,0.5f,1f,  2f,  0.5f,1f,  1f,  2f,  2f,  1f,  1f, 1f, 1f,  2f},
+        /* FIG */ new float[] {2f, 1f,  1f,  1f,  1f,  2f,  1f,  0.5f,1f,  0.5f,0.5f,0.5f,2f, 0f,  1f},
+        /* POI */ new float[] {1f, 1f,  1f,  1f,  2f,  1f,  1f,  0.5f,0.5f,1f,  1f,  1f, 0.5f,0.5f,1f},
+        /* GRO */ new float[] {1f, 2f,  1f,  2f,  0.5f,1f,  1f,  2f,  1f,  0f,  1f,  0.5f,2f, 1f,  1f},
+        /* FLY */ new float[] {1f, 1f,  1f,  0.5f,2f,  1f,  2f,  1f,  1f,  1f,  1f,  2f, 0.5f,1f,  1f},
+        /* PSY */ new float[] {1f, 1f,  1f,  1f,  1f,  1f,  2f,  2f,  1f,  1f,  0.5f,1f, 1f, 0f,  1f},
+        /* BUG */ new float[] {1f, 0.5f,1f,  1f,  2f,  1f,  0.5f,0.5f,1f,  0.5f,2f,  1f, 1f, 0.5f,1f},
+        /* ROC */ new float[] {1f, 2f,  1f,  1f,  1f,  2f,  0.5f,1f,  0.5f,2f,  1f,  2f, 1f, 1f,  1f},
+        /* GHO */ new float[] {0f, 1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  2f,  1f, 1f, 2f,  1f},
+        /* DRA */ new float[] {1f, 1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f,  1f, 1f, 1f,  2f},
+        };
+
+    public static float GetEffectiveness(PokemonType attackType, PokemonType defenseType)
+    {
+        if (attackType == PokemonType.None || defenseType == PokemonType.None)
+            return 1f;
+
+        int row = (int)attackType - 1;
+        int col = (int)defenseType - 1;
+
+        return chart[row][col];
+    }
+
 }

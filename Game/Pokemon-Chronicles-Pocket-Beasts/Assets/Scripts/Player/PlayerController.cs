@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ public class PlayerController : MonoBehaviour
     public LayerMask solidObjectsLayer;
     public LayerMask grassLayer;
 
+    public event Action OnEncountered;
+
     private bool isMoving;
     private Vector2 input;
 
@@ -19,8 +22,8 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void Update()
-    { 
+    public void HandleUpdate()
+    {
         if (!isMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");
@@ -54,8 +57,8 @@ public class PlayerController : MonoBehaviour
     {
         isMoving = true;
 
-        while ((targetPos -transform.position).sqrMagnitude > Mathf.Epsilon)
-        { 
+        while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
+        {
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
             yield return null;
         }
@@ -74,20 +77,20 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
-        return true; 
+        return true;
     }
 
     private void CheckForEncounters()
     {
         if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
         {
-            if (Random.Range(1, 101) <= 10)
-                {
-
-                Debug.Log("¡Te has encontrado a un pokemon salvaje!");
+            if (UnityEngine.Random.Range(1, 101) <= 10)
+            {
+                animator.SetBool("isMoving", false);
+                OnEncountered?.Invoke();
             }
 
-            
+
         }
     }
 }

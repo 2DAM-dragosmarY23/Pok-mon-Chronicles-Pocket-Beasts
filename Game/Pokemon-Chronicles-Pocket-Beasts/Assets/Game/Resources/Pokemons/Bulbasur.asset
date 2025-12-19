@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b926af9f2ccd442896a7cea471607e, type: 3}
+  m_Name: Bulbasur
+  m_EditorClassIdentifier: 
+  pokemonName: Bulbasur
+  description: 
+  frontSprite: {fileID: 21300000, guid: 61c491bfdf9833041908c9e4cf3fd5a2, type: 3}
+  backSprite: {fileID: 21300000, guid: 9069059059fe18d48a56d338dec24ec2, type: 3}
+  type1: 5
+  type2: 8
+  maxHP: 45
+  attack: 49
+  defense: 49
+  speed: 65
+  specialAttack: 65
+  specialDefense: 45
+  learnableMoves:
+  - moveBase: {fileID: 11400000, guid: 22f4c61585078d14f8145941529a532f, type: 2}
+    level: 1
+  - moveBase: {fileID: 11400000, guid: 320c8f38860e3cd4994a67b9a25053ed, type: 2}
+    level: 4
+  - moveBase: {fileID: 11400000, guid: b8413b24d417f084d8817f025f60a294, type: 2}
+    level: 7
