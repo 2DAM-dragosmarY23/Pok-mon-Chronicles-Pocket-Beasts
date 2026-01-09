@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "102653215264",
+    "project_id": "pokemon-tfg",
+    "storage_bucket": "pokemon-tfg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102653215264:android:76c42bbca8cf8b7db3b245",
+        "android_client_info": {
+          "package_name": "com.dragos.pokemonTfg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGP9pb_Q6J_1mF8ABdrG2xDEZKRIqRaNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

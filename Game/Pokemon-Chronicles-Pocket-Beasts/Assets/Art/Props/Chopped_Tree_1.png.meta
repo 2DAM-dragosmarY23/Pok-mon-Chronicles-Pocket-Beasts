@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Chopped_Tree_1_0: 3271274698702602163
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

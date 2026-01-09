@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Bush_Emerald_3_0: 4631256528757512972
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

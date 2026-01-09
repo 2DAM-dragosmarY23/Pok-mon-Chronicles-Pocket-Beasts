@@ -2,13 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
+/// <summary>
+/// Representa una unidad de combate en batalla (jugador o enemigo).
+/// Gestiona la visualización del Pokémon, sus animaciones y su interfaz HUD.
+/// </summary>
 public class BattleUnit : MonoBehaviour
 {
-    [SerializeField] PokemonBase _base;
-    [SerializeField] int level;
     [SerializeField] bool isPlayerUnit;
+    [SerializeField] BattleHud hud;
 
-
+    public bool IsPlayerUnit { get { return isPlayerUnit; } }
+    public BattleHud Hud { get { return hud; } }
     public Pokemon Pokemon { get; set; }
 
     Image image;
@@ -22,18 +26,30 @@ public class BattleUnit : MonoBehaviour
         originalColor = image.color;
     }
 
-    public void Setup()
+    /// <summary>
+    /// Configura la unidad con un Pokémon específico.
+    /// Establece el sprite correcto (frontal o trasero) y actualiza el HUD.
+    /// </summary>
+    public void Setup(Pokemon pokemon)
     {
-        Pokemon = new Pokemon(_base, level);
+        Pokemon = pokemon;
+
+        // Los Pokémon del jugador se muestran de espaldas
         if (isPlayerUnit)
             image.sprite = Pokemon.Base.BackSprite;
         else
             image.sprite = Pokemon.Base.FrontSprite;
 
+        hud.SetData(pokemon);
+
         image.color = originalColor;
         PlayEnterAnimation();
     }
 
+    /// <summary>
+    /// Reproduce la animación de entrada del Pokémon al campo de batalla.
+    /// Los Pokémon entran desde los laterales de la pantalla.
+    /// </summary>
     public void PlayEnterAnimation()
     {
         if (isPlayerUnit)
@@ -44,6 +60,9 @@ public class BattleUnit : MonoBehaviour
         image.transform.DOLocalMoveX(originalPosition.x, 1f);
     }
 
+    /// <summary>
+    /// Reproduce la animación de ataque: el Pokémon avanza y retrocede.
+    /// </summary>
     public void PlayAttackAnimation()
     {
         var sequence = DOTween.Sequence();
@@ -59,6 +78,9 @@ public class BattleUnit : MonoBehaviour
         sequence.Append(image.transform.DOLocalMoveX(originalPosition.x, 0.25f));
     }
 
+    /// <summary>
+    /// Reproduce la animación de recibir daño: parpadeo de color gris.
+    /// </summary>
     public void PlayHitAnimation()
     {
         var sequence = DOTween.Sequence();
@@ -66,6 +88,9 @@ public class BattleUnit : MonoBehaviour
         sequence.Append(image.DOColor(originalColor, 0.1f));
     }
 
+    /// <summary>
+    /// Reproduce la animación de debilitamiento: el Pokémon cae y desaparece.
+    /// </summary>
     public void PlayFaintAnimation()
     {
         var sequence = DOTween.Sequence();

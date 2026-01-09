@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Shadow_Sqare_24x24_Medium_Black_0: -8740632259271412296
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

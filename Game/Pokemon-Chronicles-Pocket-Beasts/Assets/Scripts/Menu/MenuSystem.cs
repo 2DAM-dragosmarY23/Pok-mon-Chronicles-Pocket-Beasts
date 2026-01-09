@@ -1,274 +1,153 @@
-using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
+Ôªøusing System;
+using System.Text.RegularExpressions;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Controlador del sistema de men√∫ inicial que gestiona login y registro de usuarios.
+/// Valida las entradas, comunica con Firebase y SQLite, y coordina las transiciones de escena.
+/// </summary>
 public class MenuSystem : MonoBehaviour
 {
-
     [Header("Campos de Login")]
     public TMP_InputField nicknameField;
     public TMP_InputField emailField;
     public TMP_InputField passwordField;
-    public Button registerButton;
     public TMP_Text errorMessage;
 
+    [Header("Escenas")]
+    public string gameSceneName = "GameScene";
+    public string adminSceneName = "AdminPanelScene";
 
-    [Header("URL del backend")]
-    public string apiBase = "http://127.0.0.1:5000/api/auth";
+    UserRepository repo = new UserRepository();
 
-    // MÈtodos de los botones
+    /// <summary>
+    /// Valida si una cadena tiene formato de email v√°lido usando expresiones regulares.
+    /// </summary>
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return false;
+
+        string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        return Regex.IsMatch(email, pattern);
+    }
+
+    /// <summary>
+    /// Procesa el inicio de sesi√≥n del usuario.
+    /// Valida las credenciales, autentica con Firebase y sincroniza con la base de datos local.
+    /// Redirige a la escena apropiada seg√∫n el rol del usuario.
+    /// </summary>
     public void StartGame()
     {
-        // Iniciar login primero
-        StartCoroutine(LoginCoroutine());
+        errorMessage.text = "";
+        string email = emailField.text.Trim();
+        string password = passwordField.text;
+        string nickname = nicknameField.text.Trim();
+
+        string errors = "";
+
+        // Validaci√≥n de campos
+        if (string.IsNullOrEmpty(email))
+            errors += "- Rellena el email\n";
+        else if (!IsValidEmail(email))
+            errors += "- El email no tiene un formato v√°lido\n";
+
+        if (string.IsNullOrEmpty(password))
+            errors += "- Rellena la contrase√±a\n";
+
+        if (string.IsNullOrEmpty(nickname))
+            errors += "- Rellena el usuario\n";
+
+        if (!string.IsNullOrEmpty(password) && password.Length < 6)
+            errors += "- La contrase√±a debe tener al menos 6 caracteres\n";
+
+        if (!string.IsNullOrEmpty(errors))
+        {
+            errorMessage.text = errors.TrimEnd('\n');
+            return;
+        }
+
+        // Intentar login con Firebase
+        AuthService.Instance.Login(email, password,
+            user =>
+            {
+                // Sincronizar con base de datos local
+                repo.CreateIfNotExists(user.UserId, user.Email);
+                Debug.Log("Login correcto: " + user.UserId);
+
+                // Determinar escena seg√∫n rol
+                var local = repo.GetByUid(user.UserId);
+                if (local != null && local.Active == 1 && local.Role == "admin")
+                    SceneManager.LoadScene(adminSceneName);
+                else
+                    SceneManager.LoadScene(gameSceneName);
+            },
+            err =>
+            {
+                errorMessage.text = err;
+            }
+        );
     }
 
-    public void QuitGame()
-    {
-        Debug.Log("Saliendo del juego...");
-        Application.Quit();
-    }
-
+    /// <summary>
+    /// Procesa el registro de un nuevo usuario.
+    /// Valida los datos, crea la cuenta en Firebase y registra al usuario en la base de datos local.
+    /// </summary>
     public void RegisterUser()
     {
-        StartCoroutine(RegisterCoroutine());
-    }
+        errorMessage.text = "";
+        string email = emailField.text.Trim();
+        string password = passwordField.text;
+        string nickname = nicknameField.text.Trim();
 
-    // Coroutine de login
-    IEnumerator LoginCoroutine()
-    {
-        string username = nicknameField?.text ?? "";
-        string password = passwordField?.text ?? "";
+        string errors = "";
 
-        if (errorMessage != null)
-            errorMessage.text = "";
+        // Validaci√≥n de campos
+        if (string.IsNullOrEmpty(email))
+            errors += "- Rellena el email\n";
+        else if (!IsValidEmail(email))
+            errors += "- El email no tiene un formato v√°lido\n";
 
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(password))
+            errors += "- Rellena la contrase√±a\n";
+
+        if (!string.IsNullOrEmpty(password) && password.Length < 6)
+            errors += "- La contrase√±a debe tener al menos 6 caracteres\n";
+
+        if (!string.IsNullOrEmpty(errors))
         {
-            Debug.LogWarning("Rellena usuario y contraseÒa.");
-            yield break;
+            errorMessage.text = errors.TrimEnd('\n');
+            return;
         }
 
-        var dto = new LoginDTO { username = username, password = password };
-        string json = JsonUtility.ToJson(dto);
-
-        using (UnityWebRequest req = new UnityWebRequest(apiBase + "/login", "POST"))
-        {
-            byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-            req.uploadHandler = new UploadHandlerRaw(body);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
-
-            // Timeout 
-            req.timeout = 10;
-
-            yield return req.SendWebRequest();
-
-            // InformaciÛn de depuraciÛn
-            Debug.Log($"REQUEST -> {req.method} {req.url}");
-            Debug.Log($"RESULT -> {req.result}  responseCode={req.responseCode}  error='{req.error}'");
-
-            string responseText = req.downloadHandler?.text;
-            Debug.Log("BODY: " + (string.IsNullOrEmpty(responseText) ? "<empty>" : responseText));
-
-            // Manejo de errores
-            if (req.result == UnityWebRequest.Result.ConnectionError ||
-                req.result == UnityWebRequest.Result.ProtocolError ||
-                req.result == UnityWebRequest.Result.DataProcessingError)
+        // Registrar en Firebase
+        AuthService.Instance.Register(email, password,
+            user =>
             {
-                // Mostrar mensaje visual
-                if (errorMessage != null)
+                // Crear usuario en base de datos local
+                UserModel newUser = new UserModel
                 {
-                    if (req.responseCode == 401)
-                        errorMessage.text = "Usuario o contraseÒa incorrectos";
-                    else
-                        errorMessage.text = "Error de conexiÛn con el servidor";
-                }
+                    Uid = user.UserId,
+                    Username = string.IsNullOrEmpty(nickname) ? email.Split('@')[0] : nickname,
+                    Email = email,
+                    Role = "player",
+                    Active = 1,
+                    CreatedAt = DateTime.UtcNow.ToString("o"),
+                    UpdatedAt = DateTime.UtcNow.ToString("o")
+                };
 
-                Debug.LogError($"Error en la peticiÛn. CÛdigo HTTP: {req.responseCode}. Error: {req.error}");
-                yield break;
-            }
+                repo.Create(newUser);
+                Debug.Log("Usuario creado en SQLite: " + newUser.Username);
 
-            // Si todo OK
-            try
+                errorMessage.color = Color.green;
+                errorMessage.text = "Registro correcto. Ya puedes iniciar sesi√≥n.";
+            },
+            err =>
             {
-                TokenResponse token = JsonUtility.FromJson<TokenResponse>(responseText);
-                if (token == null || string.IsNullOrEmpty(token.token))
-                {
-                    Debug.LogError("Respuesta inv·lida del servidor (no contiene token).");
-                    yield break;
-                }
-
-                PlayerPrefs.SetString("jwt", token.token);
-                PlayerPrefs.SetString("username", username);
-                PlayerPrefs.Save();
-
-                Debug.Log("Login correcto. Token guardado.");
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                errorMessage.text = err;
             }
-            catch (System.Exception ex)
-            {
-                Debug.LogError("Error parseando respuesta: " + ex);
-            }
-        }
+        );
     }
-
-    // Coroutine de registro
-    IEnumerator RegisterCoroutine()
-    {
-        // Limpia mensaje previo
-        if (errorMessage != null) errorMessage.text = "";
-
-        string username = nicknameField?.text?.Trim() ?? "";
-        string email = emailField?.text?.Trim() ?? "";
-        string password = passwordField?.text ?? "";
-
-        // Validaciones cliente
-        if (string.IsNullOrEmpty(username))
-        {
-            if (errorMessage != null) errorMessage.text = "El nombre de usuario no puede estar vacÌo.";
-            yield break;
-        }
-
-        if (string.IsNullOrEmpty(email) || !IsValidEmail(email))
-        {
-            if (errorMessage != null) errorMessage.text = "Introduce un correo v·lido (ej. usuario@dominio.com).";
-            yield break;
-        }
-
-        if (string.IsNullOrEmpty(password) || password.Length < 6)
-        {
-            if (errorMessage != null) errorMessage.text = "La contraseÒa debe tener al menos 6 caracteres.";
-            yield break;
-        }
-
-        // Desactivar botÛn para evitar dobles envÌos
-        if (registerButton != null) registerButton.interactable = false;
-
-        RegisterDTO dto = new RegisterDTO
-        {
-            username = username,
-            email = email,
-            password = password
-        };
-
-        string json = JsonUtility.ToJson(dto);
-
-        using (UnityWebRequest req = new UnityWebRequest(apiBase + "/register", "POST"))
-        {
-            byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
-            req.uploadHandler = new UploadHandlerRaw(body);
-            req.downloadHandler = new DownloadHandlerBuffer();
-            req.SetRequestHeader("Content-Type", "application/json");
-            req.timeout = 10;
-
-            yield return req.SendWebRequest();
-
-            // Debug (opcional)
-            Debug.Log($"REGISTER -> {req.method} {req.url} result={req.result} code={req.responseCode} err='{req.error}'");
-            string resp = req.downloadHandler != null ? req.downloadHandler.text : "";
-
-            // Manejo de errores de red
-            if (req.result == UnityWebRequest.Result.ConnectionError ||
-                req.result == UnityWebRequest.Result.DataProcessingError)
-            {
-                if (errorMessage != null) errorMessage.text = "Error de conexiÛn al registrar. Intenta m·s tarde.";
-                Debug.LogError("Register connection error: " + req.error);
-                if (registerButton != null) registerButton.interactable = true;
-                yield break;
-            }
-
-            // Si hay respuesta 4xx/5xx, intenta mostrar el mensaje del servidor
-            if (req.result == UnityWebRequest.Result.ProtocolError)
-            {
-                // Intentamos parsear { "message": "..." }
-                MessageResponse serverMsg = null;
-                try
-                {
-                    serverMsg = JsonUtility.FromJson<MessageResponse>(resp);
-                }
-                catch { /* parseo fallido */ }
-
-                if (serverMsg != null && !string.IsNullOrEmpty(serverMsg.message))
-                {
-                    errorMessage.color = Color.red;
-                    errorMessage.text = "Registro fallido: " + serverMsg.message;
-                }
-                else
-                {
-                    if (req.responseCode == 409)
-                        errorMessage.text = "El nombre de usuario ya est· registrado.";
-                    else
-                        errorMessage.text = "Registro fallido. CÛdigo: " + req.responseCode;
-                }
-
-                if (registerButton != null) registerButton.interactable = true;
-                yield break;
-            }
-
-            // OK (2xx)
-            if (req.responseCode >= 200 && req.responseCode < 300)
-            {
-                if (errorMessage != null) errorMessage.color = Color.blue;
-                if (errorMessage != null) errorMessage.text = "Registro correcto. Ya puedes iniciar sesiÛn.";
-                Debug.Log("Registro correcto: " + resp);
-            }
-            else
-            {
-                // Caso inesperado
-                if (errorMessage != null) errorMessage.text = "Error inesperado en el registro.";
-                Debug.LogWarning("Register unexpected response: " + req.responseCode + " " + resp);
-            }
-        }
-
-        // Reactivar botÛn
-        if (registerButton != null) registerButton.interactable = true;
-    }
-
-
-    // Clases auxiliares
-    [System.Serializable]
-    public class LoginDTO
-    {
-        public string username;
-        public string password;
-    }
-
-    [System.Serializable]
-    public class TokenResponse
-    {
-        public string token;
-    }
-
-    [System.Serializable]
-    public class RegisterDTO
-    {
-        public string username;
-        public string email;
-        public string password;
-    }
-
-    [System.Serializable]
-    public class MessageResponse
-    {
-        public string message;
-    }
-
-    // ValidaciÛn simple: comprueba @ y . y longitud mÌnima.
-    // Si quieres una validaciÛn m·s estricta, usar regex.
-    bool IsValidEmail(string email)
-    {
-        if (string.IsNullOrEmpty(email)) return false;
-        if (email.Length < 5) return false;
-        if (!email.Contains("@")) return false;
-        if (!email.Contains(".")) return false;
-        // @ no puede ser el primero ni el ˙ltimo
-        int at = email.IndexOf('@');
-        if (at <= 0 || at >= email.Length - 1) return false;
-        return true;
-    }
-
 }

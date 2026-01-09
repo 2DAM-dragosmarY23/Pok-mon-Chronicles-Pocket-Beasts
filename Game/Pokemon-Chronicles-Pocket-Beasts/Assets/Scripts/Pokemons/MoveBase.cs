@@ -1,6 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-
+/// <summary>
+/// ScriptableObject que define las propiedades base de un movimiento de Pokémon.
+/// Contiene información estática como poder, precisión, tipo y efectos secundarios.
+/// </summary>
 [CreateAssetMenu(fileName = "MoveBase", menuName = "Pokemons/New Move")]
 public class MoveBase : ScriptableObject
 {
@@ -13,6 +17,9 @@ public class MoveBase : ScriptableObject
     [SerializeField] int power;
     [SerializeField] int accuracy;
     [SerializeField] int pp;
+    [SerializeField] MoveCategory category;
+    [SerializeField] MoveEffects effects;
+    [SerializeField] MoveTarget target;
 
     public string MoveName
     {
@@ -44,20 +51,64 @@ public class MoveBase : ScriptableObject
         get { return pp; }
     }
 
-    public bool IsSpecial
+    public MoveCategory Category
     {
-        get {
-            if (type == PokemonType.Fire || type == PokemonType.Water || type == PokemonType.Grass
-                || type == PokemonType.Electric || type == PokemonType.Ice || type == PokemonType.Psychic
-                || type == PokemonType.Dragon)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
+        get { return category; }
     }
+
+    public MoveEffects Effects
+    {
+        get { return effects; }
+    }
+
+    public MoveTarget Target
+    {
+        get { return target; }
+    }
+}
+
+/// <summary>
+/// Define los efectos secundarios que puede tener un movimiento.
+/// Actualmente soporta modificadores de estadísticas (boosts).
+/// </summary>
+[System.Serializable]
+public class MoveEffects
+{
+    [SerializeField] List<StatBoost> boosts;
+
+    public List<StatBoost> Boosts
+    {
+        get { return boosts; }
+    }
+}
+
+/// <summary>
+/// Representa un incremento o decremento de una estadística específica.
+/// </summary>
+[System.Serializable]
+public class StatBoost
+{
+    public Stat stat;
+    public int boost;
+}
+
+/// <summary>
+/// Categoría del movimiento que determina cómo se calcula el daño.
+/// Physical usa Ataque/Defensa, Special usa Ataque Especial/Defensa Especial,
+/// y Status no causa daño directo.
+/// </summary>
+public enum MoveCategory
+{
+    Physical,
+    Special,
+    Status
+}
+
+/// <summary>
+/// Define el objetivo del movimiento: el oponente o el propio usuario.
+/// </summary>
+public enum MoveTarget
+{
+    Foe,
+    Self
 }

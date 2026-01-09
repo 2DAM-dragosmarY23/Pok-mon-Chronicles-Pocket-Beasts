@@ -12,16 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7b926af9f2ccd442896a7cea471607e, type: 3}
   m_Name: Squirtle
   m_EditorClassIdentifier: 
-  pokemonName: 
+  name: 
   description: 
   frontSprite: {fileID: 21300000, guid: e66ccd2b2aed9eb4b807d6a867490c20, type: 3}
   backSprite: {fileID: 21300000, guid: 50ecc4f8114644146b30de919c4fe42a, type: 3}
   type1: 3
   type2: 0
-  maxHP: 0
-  attack: 0
-  defense: 0
-  speed: 0
-  specialAttack: 0
-  specialDefense: 0
-  learnableMoves: []
+  maxHP: 44
+  attack: 48
+  defense: 65
+  speed: 43
+  specialAttack: 50
+  specialDefense: 64
+  learnableMoves:
+  - moveBase: {fileID: 11400000, guid: 346fbf117e99848428ec0ca011745af9, type: 2}
+    level: 1
+  - moveBase: {fileID: 11400000, guid: 7274e8e060d9eb94781b1b31b3ebfb17, type: 2}
+    level: 1
+  - moveBase: {fileID: 11400000, guid: 8e5eab69583318c47aeae78def4b0088, type: 2}
+    level: 3
+  - moveBase: {fileID: 11400000, guid: 6574ed29bd3119f46a89af8a9020524d, type: 2}
+    level: 15

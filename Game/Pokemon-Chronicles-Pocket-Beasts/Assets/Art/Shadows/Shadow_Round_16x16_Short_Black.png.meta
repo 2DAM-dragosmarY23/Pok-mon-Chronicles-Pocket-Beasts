@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Shadow_Round_16x16_Short_Black_0: -5076502897054963339
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

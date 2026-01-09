@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Banner_Stick_1_Purple_0: 5804687418827251771
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

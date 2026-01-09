@@ -348,7 +348,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Tileset_Shadow_0: 3568318920312555395
+      Tileset_Shadow_1: -5198901175054539501
+      Tileset_Shadow_2: -8808629762304285809
+      Tileset_Shadow_3: 5166230234027751778
+      Tileset_Shadow_4: -8413528714694024520
+      Tileset_Shadow_5: 1562987928363729435
+      Tileset_Shadow_6: 8446863295362241227
+      Tileset_Shadow_7: 1937148578884506401
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

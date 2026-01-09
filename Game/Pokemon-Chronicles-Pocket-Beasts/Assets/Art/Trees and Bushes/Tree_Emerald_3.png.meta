@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Tree_Emerald_3_0: 9132827457964203355
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

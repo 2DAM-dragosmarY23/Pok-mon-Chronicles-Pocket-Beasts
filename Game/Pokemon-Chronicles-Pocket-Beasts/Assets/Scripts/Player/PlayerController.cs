@@ -3,25 +3,33 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-
+/// <summary>
+/// Controlador principal del personaje del jugador.
+/// Gestiona el movimiento, detección de colisiones y encuentros con Pokémon salvajes.
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed;
     public LayerMask solidObjectsLayer;
     public LayerMask grassLayer;
 
+    // Evento que se dispara cuando ocurre un encuentro con Pokémon salvaje
     public event Action OnEncountered;
 
     private bool isMoving;
     private Vector2 input;
 
     private Animator animator;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
     }
 
-
+    /// <summary>
+    /// Método principal que procesa las entradas del jugador cada frame.
+    /// Debe ser invocado desde el GameController cuando el estado es FreeRoam.
+    /// </summary>
     public void HandleUpdate()
     {
         if (!isMoving)
@@ -29,22 +37,21 @@ public class PlayerController : MonoBehaviour
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
 
-            //Quitar movimiento diagonal
+            // Eliminar movimiento diagonal priorizando horizontal
             if (input.x != 0) input.y = 0;
 
             if (input != Vector2.zero)
             {
-                // Actualizar las variables del animador para reflejar la dirección del movimiento
+                // Actualizar parámetros del animador para reflejar la dirección
                 animator.SetFloat("moveX", input.x);
                 animator.SetFloat("moveY", input.y);
 
-                // El jugador ha proporcionado una entrada, iniciar el movimiento
+                // Calcular posición objetivo en el grid
                 var targetPos = transform.position;
                 targetPos.x += input.x;
                 targetPos.y += input.y;
 
                 if (IsWalkable(targetPos))
-
                     StartCoroutine(Move(targetPos));
             }
         }
@@ -52,11 +59,16 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isMoving", isMoving);
     }
 
-    // Coroutine para mover al jugador hacia la posición objetivo
+    /// <summary>
+    /// Corrutina que mueve suavemente al jugador hacia la posición objetivo.
+    /// Implementa movimiento tipo grid característico de los juegos Pokémon.
+    /// </summary>
+    /// <param name="targetPos">Posición de destino en el grid</param>
     private IEnumerator Move(Vector3 targetPos)
     {
         isMoving = true;
 
+        // Mover progresivamente hasta alcanzar la posición objetivo
         while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
@@ -66,12 +78,17 @@ public class PlayerController : MonoBehaviour
 
         isMoving = false;
 
+        // Verificar si se produce un encuentro tras moverse
         CheckForEncounters();
     }
 
+    /// <summary>
+    /// Verifica si una posición es transitable comprobando colisiones con objetos sólidos.
+    /// </summary>
+    /// <param name="targetPos">Posición a verificar</param>
+    /// <returns>True si la posición es accesible</returns>
     private bool IsWalkable(Vector3 targetPos)
     {
-        // Verificar colisiones con objetos sólidos
         if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer) != null)
         {
             return false;
@@ -80,6 +97,10 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Comprueba si el jugador está en hierba alta y determina aleatoriamente
+    /// si ocurre un encuentro con Pokémon salvaje (10% de probabilidad).
+    /// </summary>
     private void CheckForEncounters()
     {
         if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
@@ -89,8 +110,6 @@ public class PlayerController : MonoBehaviour
                 animator.SetBool("isMoving", false);
                 OnEncountered?.Invoke();
             }
-
-
         }
     }
 }

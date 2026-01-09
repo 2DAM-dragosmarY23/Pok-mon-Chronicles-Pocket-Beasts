@@ -173,7 +173,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Background-pokemon-chronicles_0: -437133645986022872
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
