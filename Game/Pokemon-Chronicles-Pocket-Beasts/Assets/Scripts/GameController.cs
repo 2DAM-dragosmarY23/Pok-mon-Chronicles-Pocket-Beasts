@@ -19,17 +19,23 @@ public class GameController : MonoBehaviour
     GameState state;
 
     /// <summary>
-    /// Suscribe los eventos de batalla al iniciar el juego.
+    /// Suscribe los eventos de batalla e inicializa la música del pueblo.
     /// </summary>
     private void Start()
     {
         playerController.OnEncountered += StartBattle;
         battleSystem.OnBattleOver += EndBattle;
+
+        // Iniciar música del pueblo al comenzar
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayTownMusic();
+        }
     }
 
     /// <summary>
     /// Inicia una batalla salvaje al detectar un encuentro.
-    /// Desactiva la cámara del mundo y activa el sistema de combate.
+    /// Desactiva la cámara del mundo, activa el sistema de combate y cambia la música.
     /// </summary>
     void StartBattle()
     {
@@ -41,10 +47,17 @@ public class GameController : MonoBehaviour
         var wildPokemon = FindObjectOfType<MapArea>().GetComponent<MapArea>().GetRandomWildPokemon();
 
         battleSystem.StartBattle(playerParty, wildPokemon);
+
+        // Cambiar a música de batalla
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBattleMusic();
+        }
     }
 
     /// <summary>
     /// Finaliza la batalla y devuelve al jugador al modo de exploración.
+    /// Restaura la música del pueblo.
     /// </summary>
     /// <param name="won">Indica si el jugador ganó la batalla</param>
     void EndBattle(bool won)
@@ -52,6 +65,12 @@ public class GameController : MonoBehaviour
         state = GameState.FreeRoam;
         battleSystem.gameObject.SetActive(false);
         worldCamera.gameObject.SetActive(true);
+
+        // Volver a música del pueblo
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayTownMusic();
+        }
     }
 
     /// <summary>

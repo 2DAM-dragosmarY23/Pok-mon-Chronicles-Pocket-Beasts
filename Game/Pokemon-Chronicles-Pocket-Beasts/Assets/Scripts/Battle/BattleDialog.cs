@@ -75,6 +75,7 @@ public class BattleDialog : MonoBehaviour
 
     /// <summary>
     /// Actualiza el resaltado visual de la acción seleccionada actualmente.
+    /// No reproduce sonido aquí, se gestiona en BattleSystem.
     /// </summary>
     /// <param name="selectedAction">Índice de la acción seleccionada (0-3)</param>
     public void UpdateActionSelection(int selectedAction)
@@ -90,6 +91,7 @@ public class BattleDialog : MonoBehaviour
 
     /// <summary>
     /// Actualiza el resaltado del movimiento seleccionado y muestra sus detalles (PP y tipo).
+    /// No reproduce sonido aquí, se gestiona en BattleSystem.
     /// </summary>
     /// <param name="selectedMove">Índice del movimiento seleccionado</param>
     /// <param name="move">Datos del movimiento para mostrar detalles</param>

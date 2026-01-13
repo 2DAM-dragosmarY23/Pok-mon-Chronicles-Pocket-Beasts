@@ -23,6 +23,17 @@ public class MenuSystem : MonoBehaviour
     UserRepository repo = new UserRepository();
 
     /// <summary>
+    /// Inicializa la música del menú al cargar la escena.
+    /// </summary>
+    private void Start()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayMenuMusic();
+        }
+    }
+
+    /// <summary>
     /// Valida si una cadena tiene formato de email válido usando expresiones regulares.
     /// </summary>
     private bool IsValidEmail(string email)
@@ -38,9 +49,16 @@ public class MenuSystem : MonoBehaviour
     /// Procesa el inicio de sesión del usuario.
     /// Valida las credenciales, autentica con Firebase y sincroniza con la base de datos local.
     /// Redirige a la escena apropiada según el rol del usuario.
+    /// Reproduce sonido de selección al presionar el botón.
     /// </summary>
     public void StartGame()
     {
+        // Reproducir sonido de selección
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySelectionSound();
+        }
+
         errorMessage.text = "";
         string email = emailField.text.Trim();
         string password = passwordField.text;
@@ -94,9 +112,16 @@ public class MenuSystem : MonoBehaviour
     /// <summary>
     /// Procesa el registro de un nuevo usuario.
     /// Valida los datos, crea la cuenta en Firebase y registra al usuario en la base de datos local.
+    /// Reproduce sonido de selección al presionar el botón.
     /// </summary>
     public void RegisterUser()
     {
+        // Reproducir sonido de selección
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySelectionSound();
+        }
+
         errorMessage.text = "";
         string email = emailField.text.Trim();
         string password = passwordField.text;

@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviour
 
     private bool isMoving;
     private Vector2 input;
-
     private Animator animator;
 
     private void Awake()
@@ -100,11 +99,19 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Comprueba si el jugador está en hierba alta y determina aleatoriamente
     /// si ocurre un encuentro con Pokémon salvaje (10% de probabilidad).
+    /// Reproduce el sonido de pasos sobre hierba cuando el jugador pisa esta capa.
     /// </summary>
     private void CheckForEncounters()
     {
         if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
         {
+            // Reproducir sonido de pasos en hierba
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayGrassStepSound();
+            }
+
+            // Probabilidad de encuentro
             if (UnityEngine.Random.Range(1, 101) <= 10)
             {
                 animator.SetBool("isMoving", false);

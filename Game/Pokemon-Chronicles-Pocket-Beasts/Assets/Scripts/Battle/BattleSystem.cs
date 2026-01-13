@@ -229,7 +229,7 @@ public class BattleSystem : MonoBehaviour
         {
             yield return dialogBox.TypeDialog("No es muy efectivo...");
         }
-    }       
+    }
 
     /// <summary>
     /// Intenta escapar de la batalla salvaje.
@@ -293,9 +293,12 @@ public class BattleSystem : MonoBehaviour
     /// <summary>
     /// Procesa las entradas del teclado durante la selección de acción principal.
     /// Permite navegar entre las cuatro opciones disponibles y confirmar la selección.
+    /// Reproduce sonidos de navegación y confirmación.
     /// </summary>
     void HandleActionSelection()
     {
+        int previousAction = currentAction;
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
             currentAction++;
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -307,11 +310,26 @@ public class BattleSystem : MonoBehaviour
 
         currentAction = Mathf.Clamp(currentAction, 0, 3);
 
+        // Reproducir sonido solo si la selección cambió
+        if (currentAction != previousAction)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+        }
+
         dialogBox.UpdateActionSelection(currentAction);
 
         // Tecla Z confirma la selección
         if (Input.GetKeyDown(KeyCode.Z))
         {
+            // Reproducir sonido de confirmación
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+
             if (currentAction == 0)
             {
                 // Atacar
@@ -339,9 +357,12 @@ public class BattleSystem : MonoBehaviour
     /// <summary>
     /// Procesa las entradas del teclado durante la selección de movimiento.
     /// Permite navegar entre los movimientos disponibles del Pokémon.
+    /// Reproduce sonidos de navegación y confirmación.
     /// </summary>
     void HandleMoveSelection()
     {
+        int previousMove = currentMove;
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
             currentMove++;
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -353,11 +374,26 @@ public class BattleSystem : MonoBehaviour
 
         currentMove = Mathf.Clamp(currentMove, 0, playerUnit.Pokemon.Moves.Count - 1);
 
+        // Reproducir sonido solo si la selección cambió
+        if (currentMove != previousMove)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+        }
+
         dialogBox.UpdateMoveSelection(currentMove, playerUnit.Pokemon.Moves[currentMove]);
 
         // Z confirma el movimiento seleccionado
         if (Input.GetKeyDown(KeyCode.Z))
         {
+            // Reproducir sonido de confirmación
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+
             dialogBox.EnableMoveSelector(false);
             dialogBox.EnableDialogText(true);
             StartCoroutine(PlayerMove());
@@ -365,6 +401,12 @@ public class BattleSystem : MonoBehaviour
         // X cancela y vuelve al menú de acciones
         else if (Input.GetKeyDown(KeyCode.X))
         {
+            // Reproducir sonido de cancelación
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+
             dialogBox.EnableMoveSelector(false);
             dialogBox.EnableDialogText(true);
             ActionSelection();
@@ -374,9 +416,12 @@ public class BattleSystem : MonoBehaviour
     /// <summary>
     /// Procesa las entradas del teclado en la pantalla del equipo.
     /// Valida que el Pokémon seleccionado pueda entrar en combate.
+    /// Reproduce sonidos de navegación y confirmación.
     /// </summary>
     void HandlePartyScreen()
     {
+        int previousMember = currentMember;
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
             currentMember++;
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -388,12 +433,21 @@ public class BattleSystem : MonoBehaviour
 
         currentMember = Mathf.Clamp(currentMember, 0, playerParty.Pokemons.Count - 1);
 
+        // Reproducir sonido solo si la selección cambió
+        if (currentMember != previousMember)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+        }
+
         partyScreen.UpdateMemberSelection(currentMember);
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
             var selectedMember = playerParty.Pokemons[currentMember];
-            
+
             // Validaciones antes de permitir el cambio
             if (selectedMember.HP <= 0)
             {
@@ -406,12 +460,24 @@ public class BattleSystem : MonoBehaviour
                 return;
             }
 
+            // Reproducir sonido de confirmación
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+
             partyScreen.gameObject.SetActive(false);
             state = BattleState.BUSY;
             StartCoroutine(SwitchPokemon(selectedMember));
         }
         else if (Input.GetKeyDown(KeyCode.X))
         {
+            // Reproducir sonido de cancelación
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySelectionSound();
+            }
+
             partyScreen.gameObject.SetActive(false);
             ActionSelection();
         }
